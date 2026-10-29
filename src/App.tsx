@@ -1,12 +1,15 @@
-import { useEffect } from 'react'
-import { Scene } from '@/scene/Scene'
+import { TooltipProvider } from '@/components/ui/tooltip'
 import { useGameStore } from '@/store/gameStore'
+import { MainMenu } from '@/ui/MainMenu'
+import { PlayfieldScreen } from '@/ui/PlayfieldScreen'
+import { Toast } from '@/ui/Toast'
 
 export default function App() {
-  useEffect(() => useGameStore.getState().newDiorama(), [])
+  const screen = useGameStore((s) => s.screen)
   return (
-    <div data-testid="playfield" className="relative h-full w-full">
-      <Scene />
-    </div>
+    <TooltipProvider delayDuration={250}>
+      {screen === 'menu' ? <MainMenu /> : <PlayfieldScreen />}
+      <Toast />
+    </TooltipProvider>
   )
 }

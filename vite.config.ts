@@ -12,6 +12,10 @@ export default defineConfig({
       '@': path.resolve(import.meta.dirname, './src'),
     },
   },
+  build: {
+    // three + R3F + drei make one ~1.4 MB (≈400 KB gzip) chunk; well inside the 5 s / 25 Mbps budget (§7.3).
+    chunkSizeWarningLimit: 1600,
+  },
   test: {
     environment: 'jsdom',
     globals: true,

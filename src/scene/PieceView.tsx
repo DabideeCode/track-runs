@@ -64,6 +64,10 @@ export const PieceView = memo(function PieceView({ piece, departedAt }: Props) {
       rotation: piece.rotation,
       carried: false,
       changeN: s.lastChange.n,
+      /** Settled with nothing to animate; frames are skipped until something relevant changes. */
+      rest: false,
+      restPiece: null as Piece | null,
+      restHover: false,
     }
     // Initial values only; later changes animate in useFrame.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -82,6 +86,19 @@ export const PieceView = memo(function PieceView({ piece, departedAt }: Props) {
     const rejectAge = rejected ? (now - rejected.at) / 1000 : Infinity
     const shaking = rejectAge < SHAKE_S
     const carried = dragging || shaking
+    const hoverLifted = hovered && s.mode === 'build' && !drag
+
+    // Idle fast path: a settled piece costs nothing per frame (keeps 100 pieces cheap, §7.3).
+    if (
+      anim.rest &&
+      !carried &&
+      !departedAt &&
+      s.lastChange.n === anim.changeN &&
+      anim.restPiece === piece &&
+      anim.restHover === hoverLifted
+    ) {
+      return
+    }
 
     // Undo/redo and loading may apply instantly (§7.2); everything else animates.
     const snap = s.lastChange.n !== anim.changeN && (s.lastChange.kind === 'undo' || s.lastChange.kind === 'load')
@@ -119,7 +136,7 @@ export const PieceView = memo(function PieceView({ piece, departedAt }: Props) {
         anim.lift = anim.vLift = 0
       }
     } else {
-      const target = hovered && s.mode === 'build' && !drag ? HOVER_LIFT : 0
+      const target = hoverLifted ? HOVER_LIFT : 0
       ;[anim.lift, anim.vLift] = springStep(anim.lift, anim.vLift, target, dt)
       y = anim.lift
     }
@@ -155,6 +172,18 @@ export const PieceView = memo(function PieceView({ piece, departedAt }: Props) {
     g.scale.setScalar(scale)
     yawGroup.rotation.y = anim.yaw
     lift.current = carried || anim.dropAt >= 0 ? y : 0
+
+    anim.restPiece = piece
+    anim.restHover = hoverLifted
+    anim.rest =
+      !carried &&
+      !departedAt &&
+      anim.dropAt < 0 &&
+      anim.yawAt < 0 &&
+      Math.abs(anim.x - tx) < 1e-4 &&
+      Math.abs(anim.z - tz) < 1e-4 &&
+      Math.abs(anim.vx) + Math.abs(anim.vz) + Math.abs(anim.vLift) < 1e-3 &&
+      Math.abs(anim.lift - (hoverLifted ? HOVER_LIFT : 0)) < 1e-4
 
     const ghost = carried ? ghostMaterial(dragging ? drag.valid : false) : null
     meshes.current.forEach((m, i) => {

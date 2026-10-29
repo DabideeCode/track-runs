@@ -48,8 +48,8 @@
   --card-foreground: #3b3029;
   --popover: #fbf6ec;
   --popover-foreground: #3b3029;
-  --primary: #c4704f;
-  --primary-foreground: #fdf8ef;
+  --primary: #56718e;
+  --primary-foreground: #fbf6ec;
   --secondary: #e6e9d9;
   --secondary-foreground: #3f4a36;
   --muted: #ece2d1;
@@ -59,7 +59,7 @@
   --destructive: #b0503a;
   --border: #e2d5c1;
   --input: #dccdb6;
-  --ring: #7f9bb8;
+  --ring: #4f6a86;
   --radius: 0.875rem;
 }
 
@@ -82,5 +82,52 @@
   }
   html {
     @apply font-sans;
+  }
+}
+
+@layer components {
+  /* Overlay panels read as shallow wooden toy-box trays: translucent cream with a honey rim. */
+  .tray {
+    background: color-mix(in srgb, var(--card) 86%, transparent);
+    backdrop-filter: blur(10px) saturate(1.1);
+    border-radius: 1.25rem;
+    box-shadow:
+      inset 0 0 0 1.5px rgb(217 163 91 / 0.45),
+      inset 0 2px 0 rgb(255 250 240 / 0.7),
+      0 10px 28px -14px rgb(59 48 41 / 0.45);
+  }
+  .focus-ring {
+    @apply outline-none focus-visible:ring-3 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card;
+  }
+}
+
+@keyframes train-arrive {
+  from {
+    transform: translateX(-120%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+.animate-train-arrive {
+  animation: train-arrive 2.4s cubic-bezier(0.22, 0.8, 0.25, 1) 0.2s both;
+}
+.animate-toast-in {
+  animation: toast-in 0.22s ease-out both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .animate-train-arrive,
+  .animate-toast-in {
+    animation: none;
   }
 }

@@ -69,6 +69,8 @@ export function Scene() {
       shadows="percentage"
       dpr={[1, MAX_DPR]}
       flat
+      // The canvas fills the viewport from (0, 0), so client coordinates are exact and immune to zoom quirks.
+      eventPrefix="client"
       camera={{ fov: 40, near: 0.1, far: 220, position: DEFAULT_CAMERA.toArray() }}
       gl={{ antialias: true, powerPreference: 'high-performance' }}
       onContextMenu={(e) => e.preventDefault()}

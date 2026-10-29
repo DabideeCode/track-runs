@@ -119,15 +119,20 @@ function clothTexture() {
   const g = c.getContext('2d')!
   g.fillStyle = '#f3ead8'
   g.fillRect(0, 0, 256, 256)
-  g.fillStyle = 'rgba(143,165,128,0.35)'
+  g.fillStyle = 'rgba(143,165,128,0.16)'
   for (let i = 0; i < 8; i++) {
     g.fillRect(i * 32, 0, 16, 256)
     g.fillRect(0, i * 32, 256, 16)
   }
+  // Linen slubs.
+  for (let i = 0; i < 2500; i++) {
+    g.fillStyle = `rgba(120,100,80,${Math.random() * 0.05})`
+    g.fillRect(Math.random() * 256, Math.random() * 256, 3, 1)
+  }
   const tex = new THREE.CanvasTexture(c)
   tex.colorSpace = THREE.SRGBColorSpace
   tex.wrapS = tex.wrapT = THREE.RepeatWrapping
-  tex.repeat.set(4.5, 4.5)
+  tex.repeat.set(3, 3)
   return tex
 }
 
