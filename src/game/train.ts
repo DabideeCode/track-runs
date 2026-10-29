@@ -91,12 +91,13 @@ export interface WalkResult {
 /** Follow connected track from `cursor` for `distance` tiles, travelling in the `sign` direction of u. */
 export function walk(pieces: Piece[], cursor: TrackCursor, distance: number, sign: 1 | -1): WalkResult {
   const { index, byId } = lookup(pieces)
-  let piece = byId.get(cursor.pieceId)
+  const startPiece = byId.get(cursor.pieceId)
   let u = cursor.u
   let s = sign
   let left = Math.max(0, distance)
   let moved = 0
-  if (!piece) return { cursor, sign, moved: 0, blocked: true }
+  if (!startPiece) return { cursor, sign, moved: 0, blocked: true }
+  let piece: Piece = startPiece
 
   for (;;) {
     const length = pathLength(piece.type)
@@ -110,7 +111,7 @@ export function walk(pieces: Piece[], cursor: TrackCursor, distance: number, sig
     u = s > 0 ? length : 0
     const ends = pathEnds(piece)
     const exit = s > 0 ? ends.endDir : ends.startDir
-    const next = exit ? trackNeighbour(index, piece, exit) : null
+    const next: Piece | null = exit ? trackNeighbour(index, piece, exit) : null
     if (!exit || !next || !isTrack(next.type)) {
       return { cursor: { pieceId: piece.id, u }, sign: s, moved, blocked: true }
     }
