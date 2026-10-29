@@ -41,6 +41,16 @@ export interface DragState {
   active: boolean
 }
 
+/** A drop that was refused: the scene shakes it before it returns or vanishes (§7.2). */
+export interface Rejection {
+  source: 'palette' | 'piece'
+  type: PieceType
+  pieceId?: string
+  tile: Tile | null
+  rotation: Rotation
+  at: number
+}
+
 export type ChangeKind = 'place' | 'move' | 'rotate' | 'delete' | 'undo' | 'load'
 
 export interface Store extends GameState {
@@ -54,6 +64,7 @@ export interface Store extends GameState {
   audio: AudioSettings
   drag: DragState | null
   hoverTile: Tile | null
+  rejected: Rejection | null
 
   placePiece(type: PieceType, gx: number, gz: number, rotation?: Rotation, opts?: { autoAdjust?: boolean }): ActionResult
   movePiece(id: string, gx: number, gz: number, rotation?: Rotation): ActionResult
@@ -77,6 +88,7 @@ export interface Store extends GameState {
   setLowQuality(on: boolean): void
   setDrag(drag: DragState | null): void
   setHoverTile(tile: Tile | null): void
+  setRejected(r: Rejection | null): void
 }
 
 const fail = (reason: ReasonCode): ActionResult => {
@@ -147,6 +159,7 @@ export const useGameStore = create<Store>()((set, get) => {
     audio: loadAudioSettings(),
     drag: null,
     hoverTile: null,
+    rejected: null,
 
     placePiece(type, gx, gz, rotation, opts) {
       const locked = editable()
@@ -353,6 +366,10 @@ export const useGameStore = create<Store>()((set, get) => {
       const prev = get().hoverTile
       if (prev?.gx === hoverTile?.gx && prev?.gz === hoverTile?.gz) return
       set({ hoverTile })
+    },
+
+    setRejected(rejected) {
+      set({ rejected })
     },
   }
 })
