@@ -97,6 +97,14 @@ describe('dioramas in localStorage', () => {
     expect(warn).toHaveBeenCalled()
   })
 
+  it('loads only the first of two dioramas sharing an id', () => {
+    const a = diorama('same', '2026-02-01T00:00:00.000Z')
+    const b = { ...diorama('same', '2026-02-02T00:00:00.000Z'), name: 'Copy' }
+    localStorage.setItem(SAVE_KEY, JSON.stringify({ version: 1, dioramas: [a, b] }))
+    expect(listDioramas()).toEqual([a])
+    expect(warn).toHaveBeenCalled()
+  })
+
   it('skips non-object entries in the dioramas array', () => {
     localStorage.setItem(SAVE_KEY, JSON.stringify({ version: 1, dioramas: [null, 3, 'x'] }))
     expect(listDioramas()).toEqual([])

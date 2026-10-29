@@ -81,7 +81,7 @@ function DioramaCard({
       </button>
       <div className="flex items-end justify-between gap-2 px-2 pt-3 pb-1">
         <div className="min-w-0">
-          <h3 className="truncate font-heading text-lg leading-tight font-semibold" title={d.name}>
+          <h3 className="truncate font-heading text-lg leading-tight font-extrabold" title={d.name}>
             {d.name}
           </h3>
           <p className="text-sm text-muted-foreground">Edited {dateFormat.format(new Date(d.updatedAt))}</p>
@@ -143,7 +143,7 @@ export function MainMenu() {
         <section className="mt-14 grid gap-5 sm:mt-10">
           <div className="flex flex-wrap items-end justify-between gap-x-10 gap-y-5">
             <div>
-              <h1 className="font-heading text-[5rem] leading-[0.85] font-bold tracking-tight text-ink sm:text-[7.5rem]">Track</h1>
+              <h1 className="font-heading text-[5rem] leading-[0.85] font-black tracking-tight text-ink sm:text-[7.5rem]">Track</h1>
               <p className="mt-4 max-w-lg text-lg text-bark">
                 Lay out a little wooden railway on the bedroom floor or the kitchen table, then send the train around it.
               </p>
@@ -160,7 +160,7 @@ export function MainMenu() {
         </section>
 
         <section className="mt-8" aria-labelledby="saved-heading">
-          <h2 id="saved-heading" className="font-heading text-2xl font-semibold">
+          <h2 id="saved-heading" className="font-heading text-2xl font-extrabold">
             Your dioramas
           </h2>
           {dioramas.length === 0 && (

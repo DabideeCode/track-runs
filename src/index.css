@@ -3,7 +3,7 @@
 @import "shadcn/tailwind.css";
 
 @theme inline {
-  --font-heading: 'Fraunces', 'Nunito', ui-serif, Georgia, serif;
+  --font-heading: 'Nunito', ui-rounded, system-ui, sans-serif;
   --font-sans: 'Nunito', ui-rounded, system-ui, sans-serif;
   --color-ring: var(--ring);
   --color-input: var(--input);

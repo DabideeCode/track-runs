@@ -58,3 +58,15 @@ export function countConnections(pieces: Piece[], piece: Piece): number {
   const index = buildTileIndex(pieces)
   return pieceConnectors(piece).filter((dir) => trackNeighbour(index, piece, dir)).length
 }
+
+/** One key per connected connector, including where it is, so a connection that moves counts as new. */
+export function connectionKeys(pieces: Piece[]): string[] {
+  const index = buildTileIndex(pieces)
+  const keys: string[] = []
+  for (const piece of pieces) {
+    for (const dir of pieceConnectors(piece)) {
+      if (trackNeighbour(index, piece, dir)) keys.push(`${piece.id}@${piece.gridX},${piece.gridZ}:${dir}`)
+    }
+  }
+  return keys
+}

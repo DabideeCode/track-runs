@@ -110,9 +110,9 @@ const icons: Record<PieceType, React.ReactNode> = {
       <rect x={6} y={26} width={17} height={17} rx={2.5} fill={C.cream} {...stroke} />
       <rect x={25} y={26} width={17} height={17} rx={2.5} fill={C.cream} {...stroke} />
       <rect x={15.5} y={8} width={17} height={17} rx={2.5} fill={C.cream} {...stroke} transform="rotate(8 24 16.5)" />
-      <text x={14.5} y={39} fontSize={11} fontWeight={700} textAnchor="middle" fill={C.terracotta} fontFamily="Fraunces, Georgia, serif">A</text>
-      <text x={33.5} y={39} fontSize={11} fontWeight={700} textAnchor="middle" fill={C.dustyDeep} fontFamily="Fraunces, Georgia, serif">B</text>
-      <text x={24} y={21} fontSize={11} fontWeight={700} textAnchor="middle" fill={C.sageDeep} fontFamily="Fraunces, Georgia, serif" transform="rotate(8 24 16.5)">C</text>
+      <text x={14.5} y={39} fontSize={11} fontWeight={900} textAnchor="middle" fill={C.terracotta} fontFamily="Nunito, system-ui, sans-serif">A</text>
+      <text x={33.5} y={39} fontSize={11} fontWeight={900} textAnchor="middle" fill={C.dustyDeep} fontFamily="Nunito, system-ui, sans-serif">B</text>
+      <text x={24} y={21} fontSize={11} fontWeight={900} textAnchor="middle" fill={C.sageDeep} fontFamily="Nunito, system-ui, sans-serif" transform="rotate(8 24 16.5)">C</text>
     </>
   ),
 }

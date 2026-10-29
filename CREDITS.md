@@ -17,13 +17,12 @@ The asset folders `public/assets/models/`, `public/assets/textures/`, `public/as
 
 No music, sounds or models come from commercial games or other copyrighted media.
 
-## Fonts
+## Font
 
-These are not §8 assets. They load from Google Fonts at runtime and are credited here for completeness.
+This is not a §8 asset. It loads from Google Fonts at runtime and is credited here for completeness.
 
 | Font | Source | Author | Licence |
 | --- | --- | --- | --- |
-| Fraunces | https://fonts.google.com/specimen/Fraunces | Undercase Type | SIL Open Font License 1.1 |
 | Nunito | https://fonts.google.com/specimen/Nunito | Vernon Adams, Cyreal, Jacques Le Bailly | SIL Open Font License 1.1 |
 
 ## Libraries

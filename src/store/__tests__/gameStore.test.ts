@@ -45,6 +45,48 @@ describe('placing pieces', () => {
   })
 })
 
+describe('snap on new connections', () => {
+  it('plays snap when a move swaps one connection for a new one', () => {
+    s().placePiece('straight', 5, 5, 0)
+    const b = s().placePiece('straight', 5, 6, 0).id!
+    clearSoundLog()
+    s().movePiece(b, 5, 4)
+    expect(getSoundLog()).toEqual(['move', 'snap'])
+  })
+
+  it('plays snap when a rotation swaps one connection for a new one', () => {
+    const curve = s().placePiece('curve', 5, 5, 0).id!
+    s().placePiece('straight', 5, 6, 0)
+    s().placePiece('straight', 6, 5, 90)
+    s().placePiece('straight', 4, 5, 90)
+    clearSoundLog()
+    s().rotatePiece(curve) // S,E -> W,S: keeps S, swaps E for W
+    expect(getSoundLog()).toEqual(['rotate', 'snap'])
+  })
+})
+
+describe('tool and rejection state', () => {
+  const rejection = { source: 'palette' as const, type: 'house' as const, tile: { gx: 1, gz: 1 }, rotation: 0 as const, at: 0 }
+
+  it('clears a refused drop when another tool is selected', () => {
+    s().setRejected(rejection)
+    s().selectTool('straight')
+    expect(s().rejected).toBeNull()
+  })
+
+  it('clears a refused drop when a diorama is created or opened', () => {
+    s().setRejected(rejection)
+    s().newDiorama()
+    expect(s().rejected).toBeNull()
+  })
+
+  it('puts the station tool down once the station is placed', () => {
+    s().selectTool('station')
+    s().placePiece('station', 4, 4, 0)
+    expect(s().selectedTool).toBeNull()
+  })
+})
+
 describe('moving, rotating, deleting', () => {
   it('moves a piece and plays the move sound', () => {
     const { id } = s().placePiece('house', 1, 1)

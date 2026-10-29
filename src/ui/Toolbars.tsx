@@ -72,7 +72,7 @@ export function TopBar({ onBack }: { onBack(): void }) {
           <ArrowLeft className="size-[18px]" /> Menu
         </UiButton>
         <div className="flex min-w-0 items-center gap-2 border-l border-border/80 pl-3">
-          <span className="truncate font-heading text-lg font-semibold" title={name}>
+          <span className="truncate font-heading text-lg font-extrabold" title={name}>
             {name}
           </span>
           {dirty && (

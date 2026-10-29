@@ -3,7 +3,8 @@
 import { playSound } from '@/audio/soundBus'
 import { validatePlacement } from '@/game/rules'
 import type { PieceType, Rotation, Tile } from '@/game/types'
-import { useGameStore, type DragState } from '@/store/gameStore'
+import { useGameStore, type DragState, type Rejection } from '@/store/gameStore'
+import { SHAKE_S } from './anim'
 import { clientOverCanvas, clientToTile } from './pointer'
 
 const DRAG_THRESHOLD_PX = 4
@@ -61,7 +62,7 @@ function drop(drag: DragState, tile: Tile | null) {
   } else {
     playSound('invalid')
   }
-  s.setRejected({
+  reject({
     source: drag.source,
     type: drag.type,
     pieceId: drag.pieceId,
@@ -69,6 +70,14 @@ function drop(drag: DragState, tile: Tile | null) {
     rotation: drag.rotation,
     at: performance.now(),
   })
+}
+
+/** Show a refused drop shaking, then clear it so it never outlives its animation. */
+function reject(r: Rejection) {
+  store().setRejected(r)
+  window.setTimeout(() => {
+    if (store().rejected === r) store().setRejected(null)
+  }, SHAKE_S * 1000 + 50)
 }
 
 function onKey(e: KeyboardEvent) {
@@ -150,6 +159,6 @@ export function clickPlace(tile: Tile | null) {
   }
   const r = s.placePiece(s.selectedTool, tile.gx, tile.gz, toolRotation, { autoAdjust: true })
   if (!r.ok) {
-    s.setRejected({ source: 'palette', type: s.selectedTool, tile, rotation: toolRotation, at: performance.now() })
+    reject({ source: 'palette', type: s.selectedTool, tile, rotation: toolRotation, at: performance.now() })
   }
 }

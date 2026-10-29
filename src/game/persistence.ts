@@ -107,10 +107,15 @@ function load(): Loaded {
     return { file: { version: 1, dioramas: [] }, corrupt: true }
   }
   const dioramas: Diorama[] = []
+  const seen = new Set<string>()
   parsed.dioramas.forEach((entry, i) => {
     const result = parseDiorama(entry)
     if (typeof result === 'string') console.warn(`[Track] Skipping saved diorama #${i + 1}: ${result}.`)
-    else dioramas.push(result)
+    else if (seen.has(result.id)) console.warn(`[Track] Skipping saved diorama #${i + 1}: duplicate id.`)
+    else {
+      seen.add(result.id)
+      dioramas.push(result)
+    }
   })
   return { file: { version: 1, dioramas }, corrupt: false }
 }

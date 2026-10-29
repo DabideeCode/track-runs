@@ -68,7 +68,7 @@ function PaletteItem({ type }: { type: PieceType }) {
 function Group({ title, types }: { title: string; types: PieceType[] }) {
   return (
     <section aria-label={title}>
-      <h2 className="px-1.5 pb-1 font-heading text-[0.95rem] font-semibold text-bark">{title}</h2>
+      <h2 className="px-1.5 pb-1 font-heading text-[0.95rem] font-extrabold text-bark">{title}</h2>
       <div className="grid grid-cols-3 gap-0.5">
         {types.map((t) => (
           <PaletteItem key={t} type={t} />

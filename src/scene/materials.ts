@@ -138,7 +138,7 @@ export const materials = {
       g.lineWidth = 8
       g.strokeRect(10, 10, 108, 108)
       g.fillStyle = ink
-      g.font = '700 78px Fraunces, Georgia, serif'
+      g.font = '900 80px Nunito, ui-rounded, system-ui, sans-serif'
       g.textAlign = 'center'
       g.textBaseline = 'middle'
       g.fillText(letter, 64, 70)

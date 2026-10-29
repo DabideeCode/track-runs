@@ -1,7 +1,7 @@
 import { nanoid } from 'nanoid'
 import { create } from 'zustand'
 import { playSound } from '@/audio/soundBus'
-import { getConnections } from '@/game/connections'
+import { connectionKeys } from '@/game/connections'
 import {
   getDiorama,
   listDioramas,
@@ -100,7 +100,9 @@ export const useGameStore = create<Store>()((set, get) => {
   /** Commit a new pieces array as one undoable edit, with its sounds. */
   const commit = (pieces: Piece[], kind: ChangeKind, id: string | undefined, sound: 'place' | 'move' | 'rotate' | 'delete') => {
     const before = get().pieces
-    const madeConnection = sound !== 'delete' && getConnections(pieces).length > getConnections(before).length
+    // Snap whenever a connection exists that did not before (AC-7.5), even if another one was lost.
+    const had = new Set(connectionKeys(before))
+    const madeConnection = sound !== 'delete' && connectionKeys(pieces).some((key) => !had.has(key))
     set((s) => ({
       pieces,
       history: [...s.history, before].slice(-HISTORY_LIMIT),
@@ -132,6 +134,7 @@ export const useGameStore = create<Store>()((set, get) => {
       future: [],
       drag: null,
       hoverTile: null,
+      rejected: null,
       lastChange: { kind: 'load', n: s.lastChange.n + 1 },
       cameraResetN: s.cameraResetN + 1,
     }))
@@ -171,6 +174,8 @@ export const useGameStore = create<Store>()((set, get) => {
       const rot = adjust ? autoAdjustRotation(pieces, { type, gx, gz, rotation: rotation ?? 0 }) : rotation!
       const piece: Piece = { id: nanoid(10), type, gridX: gx, gridZ: gz, rotation: rot }
       commit([...pieces, piece], 'place', piece.id, 'place')
+      // Only one station is allowed (AC-8.4): put the station tool down once it is used.
+      if (type === 'station' && get().selectedTool === 'station') set({ selectedTool: null })
       return { ok: true, id: piece.id }
     },
 
@@ -287,7 +292,7 @@ export const useGameStore = create<Store>()((set, get) => {
 
     selectTool(tool) {
       if (get().mode === 'play') return
-      set({ selectedTool: tool, selectedPieceId: null })
+      set({ selectedTool: tool, selectedPieceId: null, rejected: null })
     },
 
     selectPiece(id) {
