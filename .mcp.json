@@ -1,0 +1,25 @@
+{
+  "mcpServers": {
+    "context7": {
+      "type": "http",
+      "url": "https://mcp.context7.com/mcp"
+    },
+    "mobbin": {
+      "type": "http",
+      "url": "https://api.mobbin.com/mcp"
+    },
+    "chrome-devtools": {
+      "type": "stdio",
+      "command": "npx",
+      "args": [
+        "-y",
+        "chrome-devtools-mcp@1.12.0",
+        "--isolated",
+        "--viewport",
+        "1920x1080",
+        "--no-usage-statistics",
+        "--no-performance-crux"
+      ]
+    }
+  }
+}

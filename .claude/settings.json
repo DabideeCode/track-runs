@@ -1,0 +1,40 @@
+{
+  "model": "claude-opus-5-5",
+  "effortLevel": "high",
+  "env": {
+    "CLAUDE_CODE_SUBAGENT_MODEL": "claude-opus-5-5",
+    "CLAUDE_CODE_SUBAGENT_MODEL_FORCE": "1"
+  },
+  "permissions": {
+    "defaultMode": "acceptEdits",
+    "allow": [
+      "Bash(npm *)",
+      "Bash(npx *)",
+      "Bash(node *)",
+      "Bash(git *)",
+      "Bash(curl *)",
+      "Bash(wget *)",
+      "Bash(ls *)",
+      "Bash(cat *)",
+      "Bash(mkdir *)",
+      "Bash(cp *)",
+      "Bash(mv *)",
+      "Bash(touch *)",
+      "WebFetch(domain:*)",
+      "WebSearch",
+      "mcp__context7__*",
+      "mcp__mobbin__*",
+      "mcp__chrome-devtools__*",
+      "Bash(.specify/scripts/bash/*)",
+      "Bash(bash .specify/scripts/bash/*)"
+    ],
+    "deny": [
+      "Bash(git push *)",
+      "Bash(git remote *)",
+      "Bash(sudo *)"
+    ]
+  },
+  "enabledPlugins": {
+    "superpowers@claude-plugins-official": false
+  }
+}
