@@ -1,0 +1,86 @@
+@import 'tailwindcss';
+
+@theme {
+  --color-cream: #f6eddd;
+  --color-cream-deep: #eadcc4;
+  --color-paper: #fbf6ec;
+  --color-honey: #c8995c;
+  --color-honey-deep: #9c6f3c;
+  --color-sage: #8fa98a;
+  --color-sage-deep: #5f7c5d;
+  --color-dusty: #7f9db4;
+  --color-dusty-deep: #557489;
+  --color-terracotta: #c0735a;
+  --color-terracotta-deep: #96513c;
+  --color-ink: #3a2f26;
+  --color-ink-soft: #6c5d4e;
+
+  --font-sans: ui-rounded, 'SF Pro Rounded', 'Segoe UI', system-ui, sans-serif;
+
+  --shadow-soft: 0 6px 20px rgb(74 52 30 / 0.18);
+}
+
+@keyframes roll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(350px);
+  }
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background-color: var(--color-cream);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+:focus-visible {
+  outline: 3px solid var(--color-dusty-deep);
+  outline-offset: 2px;
+}
+
+.range-input {
+  appearance: none;
+  height: 1.25rem;
+  background: transparent;
+  cursor: pointer;
+}
+
+.range-input::-webkit-slider-runnable-track {
+  height: 0.375rem;
+  border-radius: 9999px;
+  background: var(--color-cream-deep);
+}
+
+.range-input::-moz-range-track {
+  height: 0.375rem;
+  border-radius: 9999px;
+  background: var(--color-cream-deep);
+}
+
+.range-input::-webkit-slider-thumb {
+  appearance: none;
+  width: 1rem;
+  height: 1rem;
+  margin-top: -0.3125rem;
+  border-radius: 9999px;
+  background: var(--color-honey-deep);
+}
+
+.range-input::-moz-range-thumb {
+  width: 1rem;
+  height: 1rem;
+  border: 0;
+  border-radius: 9999px;
+  background: var(--color-honey-deep);
+}

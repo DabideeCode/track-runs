@@ -167,8 +167,33 @@ If a track cannot be confirmed and downloaded, the `tone` fallback is the expect
 
 **Rationale**: Section 11 requires no console errors, and each of these is a common way to break that.
 
+## Implementation outcomes
+
+Recorded during `/speckit-implement`, where the result differs from or adds to the decisions above.
+
+- **R1**: TypeScript 7.0.2 compiled the project and all third-party types, so the step-down was not needed.
+- **R2**: `@types/node` was added as a dev dependency for `vite.config.ts`. The runtime list is unchanged.
+- **R6**: `Ground.tsx` keeps the bedroom surfaces opaque and fades the table in above them over 0.6 s. An early version crossfaded two transparent surfaces, and the background showed through mid-transition.
+- **R7**: With a tool active, the board uses the ground tile only, so a free tile behind a tall piece can still be reached. With no tool, box picking applies. Hover is recomputed when the camera moves, because the camera can move under a still pointer.
+- **R8**: Ghost motion uses frame-rate-independent easing in `DragGhost.tsx` instead of `@react-spring/three`, because it follows a target every frame. Resting pieces use springs.
+- **R10, sound effects**: all 11 effects are synthesised. Kenney's Impact Sounds is CC0 but offers no direct download, OpenGameArt returned 403 to automated requests and was not pursued, and Freesound needs an account.
+- **R10, music**: "Carefree" by Kevin MacLeod, CC BY 4.0. Incompetech's metadata lists ukulele, guitar, marimba and glockenspiel, with the feel "Bouncy, Bright, Calming, Uplifting". It was re-encoded from 6.5 MB to 3.2 MB at 128 kbps to fit the 5 MB budget. The `tone` track remains as the load-failure fallback. Nobody has listened to it in this project, so its fit is based on the metadata only.
+- **R12**: Poly Haven "Wood Floor" and "Plywood" are used, both CC0, with authors confirmed on their asset pages. Rug and piece grain are drawn in code.
+- **R13**: Palette width is 13 rem, so "Building blocks" fits on one line.
+- **R14**: The autosave test waits a real 30 seconds. A mocked clock would also stop `requestAnimationFrame`, which the scene depends on.
+- **Measured performance**: with 100 pieces at 1920 × 1080, on Intel Arc integrated graphics (Direct3D 11) and with a `readPixels` flush forcing the GPU to finish each frame: about 98 fps in Build and Play at pixel ratio 1.5, and about 140 fps at pixel ratio 1. This is not the Iris Xe named in Section 7.3, and Intel Arc integrated graphics is generally the faster of the two, so the result is a strong indication and not a direct measurement. Without the flush, headless Chrome reported a flat 240 fps, which reflected frame scheduling and not render cost.
+- **Measured load time**: three cold loads on a throttled 25 Mbps connection reached a ready board in 1.5 to 1.9 s. Initial JavaScript is 226 KB compressed, and `tone` is in its own chunk. Floor textures load after that without blocking play.
+- **Selection outline**: drei `Outlines` in `screenspace` mode produced large stray shards on the merged geometry, so world-space thickness is used. A rim alone was too faint at normal zoom, so a footprint ring in deep dusty blue was added.
+- **Task T002**: `noUnusedLocals` and `noUnusedParameters` were added to `tsconfig.json`.
+- **Plan file tree**: `src/store/trainRuntime.ts` and `tests/perf/measure.mjs` were added. `src/scene/PieceNode.tsx` holds the lift, hover and rotate springs.
+
 ## Sources
 
+- [Poly Haven licence](https://polyhaven.com/license)
+- [Poly Haven Wood Floor](https://polyhaven.com/a/wood_floor)
+- [Poly Haven Plywood](https://polyhaven.com/a/plywood)
+- [Incompetech licensing FAQ](https://incompetech.com/music/royalty-free/faq.html)
+- [Kenney Impact Sounds](https://kenney.nl/assets/impact-sounds)
 - [Kenney Interface Sounds on OpenGameArt](https://opengameart.org/content/interface-sounds)
 - [Overview of Kenney's CC0 audio packs](https://gtstu.com/?p=5011)
 - [Yannz41 Indie Meditations free pack](https://yannz41.itch.io/indie-meditations-free-music-pack/devlog/931120/new-free-pack-minimalistic-cozy)

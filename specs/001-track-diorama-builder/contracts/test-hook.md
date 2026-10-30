@@ -12,6 +12,8 @@
 
 The hook exists from app start, including on the main menu (spec D-23).
 
+When the hook is enabled, a second helper, `window.__TRACK_PROJECT__(x, y, z)`, projects a world position to screen coordinates. It is an addition for this project's own pointer tests and is not part of Section 10.
+
 ## Functions
 
 All actions apply Section 8 rules in the order given in [data-model.md](../data-model.md).

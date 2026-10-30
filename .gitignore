@@ -13,6 +13,9 @@ dist-ssr/
 # Logs
 *.log
 
+# Scratch folder for clean-clone checks and downloads
+.tmp/
+
 # Test output (if a tool writes its own tests)
 coverage/
 playwright-report/
