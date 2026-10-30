@@ -1,0 +1,28 @@
+{
+  "mcpServers": {
+    "context7": {
+      "url": "https://mcp.context7.com/mcp",
+      "disabled": false,
+      "autoApprove": ["*"]
+    },
+    "mobbin": {
+      "url": "https://api.mobbin.com/mcp",
+      "disabled": false,
+      "autoApprove": ["*"]
+    },
+    "chrome-devtools": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "chrome-devtools-mcp@1.12.0",
+        "--isolated",
+        "--viewport",
+        "1920x1080",
+        "--no-usage-statistics",
+        "--no-performance-crux"
+      ],
+      "disabled": false,
+      "autoApprove": ["*"]
+    }
+  }
+}
