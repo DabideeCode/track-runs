@@ -4,6 +4,7 @@ node_modules/
 # Build output
 dist/
 dist-ssr/
+dist-e2e*/
 
 # Environment and secrets
 .env
@@ -17,6 +18,7 @@ dist-ssr/
 coverage/
 playwright-report/
 test-results/
+test-results-*/
 
 # Editor and OS files
 .vscode/*

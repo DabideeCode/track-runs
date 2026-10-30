@@ -1,0 +1,172 @@
+@import "tailwindcss";
+
+/*
+ * Overlay theme (Requirements 1.3, 30.2 to 30.7, 40.5).
+ *
+ * Every hex value below is a token from `src/theme/palette.ts` with the same
+ * value; `tests/unit/theme/index-css.test.ts` checks that, and that each one
+ * passes the palette rule (Requirement 30.3). Tailwind's default colour,
+ * shadow and font scales are removed, so only these tokens can be used.
+ */
+
+/* Semantic tokens (shadcn/ui names). Values are palette tokens. */
+:root {
+  --background: #f6efe3; /* cream */
+  --foreground: #3f3329; /* ink */
+  --panel: #f4ece0; /* panel */
+  --panel-foreground: #3f3329; /* ink */
+  --card: #f4ece0; /* panel */
+  --card-foreground: #3f3329; /* ink */
+  --popover: #f4ece0; /* panel */
+  --popover-foreground: #3f3329; /* ink */
+  --primary: #6b4a33; /* walnut */
+  --primary-foreground: #f6efe3; /* cream */
+  --secondary: #ece0cc; /* parchment */
+  --secondary-foreground: #3f3329; /* ink */
+  --muted: #ece0cc; /* parchment */
+  --muted-foreground: #6e5f50; /* inkMuted */
+  --accent: #ece0cc; /* parchment */
+  --accent-foreground: #3f3329; /* ink */
+  --success: #6f8a62; /* sageDeep */
+  --success-foreground: #f6efe3; /* cream */
+  --destructive: #a65a44; /* terracottaDeep */
+  --destructive-foreground: #f6efe3; /* cream */
+  --info: #5f7a94; /* dustyBlueDeep */
+  --border: #d8c8b0; /* border */
+  --input: #d8c8b0; /* border */
+  --ring: #5b86b0; /* focusRing (accent, Requirement 30.3) */
+  --shadow-tint: #3b2a1f; /* walnutDark, used only with transparency */
+  --radius: 0.625rem;
+}
+
+@theme {
+  /* Only palette colours exist as utilities. */
+  --color-*: initial;
+  --color-cream: #f6efe3;
+  --color-parchment: #ece0cc;
+  --color-honey: #d4a465;
+  --color-sage: #9caf88;
+  --color-sage-deep: #6f8a62;
+  --color-dusty-blue: #8aa1b8;
+  --color-dusty-blue-deep: #5f7a94;
+  --color-terracotta: #c6735a;
+  --color-terracotta-deep: #a65a44;
+  --color-walnut: #6b4a33;
+  --color-ink: #3f3329;
+  --color-ink-muted: #6e5f50;
+
+  /* One typeface family for all text (Requirement 30.6, D-24). */
+  --font-*: initial;
+  --font-sans: ui-rounded, "SF Pro Rounded", "Segoe UI Variable Text", system-ui, sans-serif;
+  --font-mono: ui-rounded, "SF Pro Rounded", "Segoe UI Variable Text", system-ui, sans-serif;
+
+  /* Every radius step is at least 6 px (Requirement 30.4). */
+  --radius-xs: 6px;
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 10px;
+  --radius-xl: 14px;
+  --radius-2xl: 18px;
+  --radius-3xl: 24px;
+  --radius-4xl: 32px;
+
+  /* Soft walnut-tinted shadows instead of black ones. */
+  --shadow-*: initial;
+  --shadow-xs: 0 1px 2px 0 color-mix(in srgb, var(--shadow-tint) 10%, transparent);
+  --shadow-sm: 0 2px 6px 0 color-mix(in srgb, var(--shadow-tint) 12%, transparent);
+  --shadow-md: 0 4px 12px -2px color-mix(in srgb, var(--shadow-tint) 16%, transparent);
+  --shadow-lg: 0 10px 28px -6px color-mix(in srgb, var(--shadow-tint) 22%, transparent);
+  /* Panels, dialogs, toasts: blur radius 20 px, at least 8 px (Requirement 30.7). */
+  --shadow-panel: 0 6px 20px 0 color-mix(in srgb, var(--shadow-tint) 18%, transparent);
+
+  --animate-fade-in: fade-in 150ms ease-out;
+  --animate-fade-out: fade-out 150ms ease-in;
+  --animate-pop-in: pop-in 150ms ease-out;
+  --animate-pop-out: pop-out 120ms ease-in;
+  --animate-toast-in: toast-in 200ms ease-out;
+  --animate-toast-out: fade-out 150ms ease-in;
+
+  @keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes fade-out {
+    from { opacity: 1; }
+    to { opacity: 0; }
+  }
+  @keyframes pop-in {
+    from { opacity: 0; transform: scale(0.96); }
+    to { opacity: 1; transform: scale(1); }
+  }
+  @keyframes pop-out {
+    from { opacity: 1; transform: scale(1); }
+    to { opacity: 0; transform: scale(0.96); }
+  }
+  @keyframes toast-in {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+}
+
+/* Semantic colour utilities: bg-background, text-foreground, ring-ring, ... */
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-panel: var(--panel);
+  --color-panel-foreground: var(--panel-foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-info: var(--info);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+}
+
+/*
+ * Overlay panel: rounded, at least 12 px padding and 8 px gaps, translucent
+ * (opacity 0.9) with a 20 px blur shadow (Requirements 30.4, 30.5, 30.7).
+ */
+@utility panel {
+  display: flex;
+  gap: calc(var(--spacing) * 2);
+  padding: calc(var(--spacing) * 3);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  background-color: color-mix(in srgb, var(--panel) 90%, transparent);
+  color: var(--panel-foreground);
+  box-shadow: var(--shadow-panel);
+  backdrop-filter: blur(8px);
+  pointer-events: auto;
+}
+
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+  html,
+  body,
+  #root {
+    height: 100%;
+    margin: 0;
+  }
+  body {
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+}
