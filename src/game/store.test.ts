@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { clearSoundLog, getSoundLog } from '@/audio/log'
+import { clearSoundLog } from '@/audio/log'
 import { loadDioramas, SAVE_KEY } from './persistence'
 import { useGame, uniqueName } from './store'
 import { createTestHook } from './testHook'
