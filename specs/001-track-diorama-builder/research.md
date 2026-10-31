@@ -15,10 +15,8 @@ howler) and `npm view` on 2026-10-31. Choices not covered by `requirement.md` ar
 | @react-three/fiber | ^9.8.2 | |
 | @react-three/drei | ^10.7.9 | Peer `@react-three/fiber ^9` |
 | zustand | ^5.0.16 | |
-| @react-spring/three | ^10.1.2 | |
 | howler, @types/howler | ^2.2.4 | Types are dev only |
 | nanoid | ^6.0.2 | |
-| tone | ^15.1.22 | Loaded only by the music fallback (R12) |
 | @radix-ui/react-* | current | Only the primitives in R3 |
 | vite, @vitejs/plugin-react | ^8.3.5, ^6.1.2 | Dev |
 | tailwindcss, @tailwindcss/vite | ^4.3.3 | Dev: compiled away at build time |
@@ -82,7 +80,7 @@ shadcn component, so the stack rule still holds.
 the grid at ground height to clamp the target. "Reset view" calls `reset(true)` for a smooth return.
 The canvas suppresses the context menu.
 
-The default view has its target at the origin, a polar angle of 50° and a distance of 21. A test asserts
+The default view has its target at the origin, a polar angle of 50° and a distance of 23. A test asserts
 that the whole grid is visible at 1920 × 1080.
 
 **Rationale**: Docs confirm `mouseButtons` and its action constants, and that limit props are forwarded
@@ -144,12 +142,15 @@ default. Lettered blocks use a small canvas texture.
 
 ## R9. Animation
 
-**Decision**: Use `@react-spring/three` for active-piece motion. Drag follow uses a spring tuned to
-settle within 250 ms, with tilt taken from its velocity and capped at 8°. Rotate is a 150 ms ease-out,
+**Decision**: A small pure module, `src/scene/pieceMotion.ts`, stepped in `useFrame`. This replaced the
+original choice of `@react-spring/three` during implementation: see "Changes during implementation". Drag
+follow uses a critically damped spring that settles within 250 ms, with tilt taken from its velocity and
+capped at 8°. Rotate is a 150 ms ease-out,
 delete a 200 ms shrink and fade, and shake a 200 ms keyframe sequence. The train uses its own
 simulation (R10). Undo and redo apply instantly.
 
-**Rationale**: It is on the allowlist, it is built for this, and it runs on the render loop.
+**Rationale**: Each Section 7.2 timing can be unit tested exactly, at normal and low frame rates. The
+spring is solved exactly, so it cannot overshoot at a low frame rate. It also removes a dependency.
 
 ## R10. Train simulation
 
@@ -185,9 +186,13 @@ pipeline, that must stay out of the bundle. Bundle size is checked in the quicks
 - **Autoplay**: nothing is passed to Howler until the first `pointerdown` or `keydown`. Calling it
   earlier would queue sounds and release them in a burst. Events are still logged (spec Edge Cases).
 - **Chug**: a looping clip whose volume is updated from train speed.
-- **Fallback**: sounds with no sourced file are synthesised on Howler's shared `AudioContext`. `tone` is
-  imported dynamically only if no music file exists, so it never enters the main bundle otherwise.
-- **Formats**: `.mp3` for broad browser support, including Safari.
+- **Fallback**: sounds with no sourced file are synthesised on Howler's shared `AudioContext`. A sourced music file
+  exists, so `tone` was not needed and is not a dependency.
+- **Formats**: `.mp3` for every sound, for broad browser support. Effects were sourced as `.ogg`, then
+  converted, because WebKit could not play `.ogg`. Any effect that fails to decode still falls back to
+  synthesis at run time.
+- **Leading silence**: trimmed during conversion. Sounds start 26 to 28 ms into the decoded file, or 59 ms
+  for the slow-rising squeak, which is inside the 100 ms limit.
 
 **Rationale**: Docs confirm `html5`, `loop`, `onplayerror` and that audio stays locked until a user
 gesture.
@@ -198,10 +203,10 @@ gesture.
 
 | Asset | Source | Status on 2026-10-31 |
 | --- | --- | --- |
-| 3D models | Section 8 fallback: built from primitives with procedural and textured materials | See below |
-| Textures | ambientCG (CC0): wood, floorboards, tabletop, fabric, at 1024 or smaller | API and download reachable |
-| Effects | OpenGameArt, CC0 or CC-BY only, then Web Audio synthesis | Site reachable |
-| Music | OpenGameArt, CC0 or CC-BY only, under 5 MB, then `tone` | CC0 music search reachable |
+| 3D models | Section 8 fallback: built from primitives with textured materials | See below |
+| Textures | ambientCG (CC0): wood, floorboards, tabletop, fabric, at 1024 or smaller | Used |
+| Effects | OpenGameArt pack "100 CC0 metal and wood SFX", plus synthesis for the whistle and chug | Used |
+| Music | OpenGameArt "Cozy Puzzle Title" by MintoDog, CC0, 2.4 MB, loopable | Used |
 
 **Rationale for models**: A search found no confirmed CC0 wooden toy set in `.glb`. The closest leads
 are paid, royalty-free rather than CC0, or unclear on licence. Kenney's CC0 Train Kit is the strongest
@@ -236,11 +241,32 @@ Warnings use `console.warn`, so Section 11's "no console errors" still holds.
 WebKit. Playwright browsers install inside `node_modules` (`PLAYWRIGHT_BROWSERS_PATH=0`), as `CLAUDE.md`
 keeps work inside the project folder. Performance and visual checks use `chrome-devtools`.
 
-**Limits**: Playwright WebKit is close to Safari but is not Safari, and no Mac is available here. An
-Intel Iris Xe may not be available either. Any check that could not run on the named target goes in
+**Limits**: Playwright WebKit is close to Safari but is not Safari, and no Mac is available here. This
+machine has Intel Arc integrated graphics, the same class as the Iris Xe in the requirement and likely
+faster, so an Iris Xe itself is unmeasured. Any check that could not run on the named target goes in
 `README.md` under known limitations.
 
 ## R17. Design references
 
 **Decision**: Use `mobbin` during overlay implementation, not in planning. It helps with visual detail,
 but layout is already bounded by the 25% limit in `contracts/ui-and-input.md`.
+
+**Outcome**: Not used. The overlay was judged against Section 7.1 directly from screenshots of the running
+app.
+
+## Changes during implementation
+
+Decisions that changed once real code and real measurements existed.
+
+| Decision | Planned | Built | Why |
+| --- | --- | --- | --- |
+| R9 piece motion | `@react-spring/three` | Pure `pieceMotion.ts` | Timings can be unit tested, and tilt needs spring velocity. One less dependency |
+| R4 default distance | 21 | 23 | At 21 the near grid corners would reach the palette at 1280 wide. A test now covers this |
+| R12 effect format | `.mp3` | `.mp3`, converted from the sourced `.ogg` | A first version kept `.ogg`, but WebKit reported no `.ogg` support, so all sourced effects would have been lost there |
+| R12 music fallback | `tone`, loaded lazily | Not needed, `tone` removed | A suitable CC0 track was found |
+| R13 extra texture | Not planned | `wood-grain-light.jpg` | Yellow grain turned painted colours olive, so paint uses a neutral grain |
+| R13 regrading | Resize only | Floorboards, tabletop and fabric regraded | The raw textures fought the Section 7.1 palette, and the track vanished against them |
+| R6 shadow type | Soft (`PCFSoftShadowMap`) | `PCFShadowMap` | Three.js 0.187 removed the soft type |
+| Low quality | Pixel ratio 1 | Pixel ratio 0.75, and the light stops casting | Ratio 1 changes nothing on a standard display. Disabling the light recompiles materials correctly |
+| Thumbnails | Draw the canvas | Small offscreen render | Avoids reading back the full canvas |
+| Test workers | 2 | 1 | Software rendering is CPU heavy, so parallel runs starve each other |

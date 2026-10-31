@@ -1,0 +1,45 @@
+@import "tailwindcss";
+
+@theme {
+  --color-cream: #f3e9d8;
+  --color-parchment: #fbf5ea;
+  --color-linen: #e8dcc6;
+  --color-honey: #c9964f;
+  --color-honey-deep: #99682f;
+  --color-sage: #8fa68a;
+  --color-sage-deep: #55704f;
+  --color-dusty: #7f9ab0;
+  --color-dusty-deep: #4c6a82;
+  --color-terracotta: #c4775a;
+  --color-terracotta-deep: #a04f33;
+  --color-ink: #46382d;
+  --color-ink-soft: #6f5d4e;
+
+  --font-sans: ui-rounded, "SF Pro Rounded", "Segoe UI", system-ui, sans-serif;
+
+  --shadow-soft: 0 6px 22px rgb(70 56 45 / 0.16);
+  --shadow-press: 0 1px 3px rgb(70 56 45 / 0.22);
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--color-cream);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-dusty-deep);
+  outline-offset: 2px;
+}
+
+input[type="range"].track-range {
+  accent-color: var(--color-honey-deep);
+}

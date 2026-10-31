@@ -20,8 +20,8 @@ animating.
 **Language/Version**: TypeScript 7 on Node.js from `.nvmrc` (v22.17.0)
 
 **Primary Dependencies**: React 19.3, Vite 8, Tailwind CSS 4, shadcn/ui source on Radix primitives,
-Three.js 0.187, @react-three/fiber 9, @react-three/drei 10, Zustand 5, @react-spring/three 10, howler 2,
-nanoid 6, tone 15 (lazy fallback only). Versions and reasons are in `research.md` R1.
+Three.js 0.187, @react-three/fiber 9, @react-three/drei 10, Zustand 5, howler 2, nanoid 6. Versions and
+reasons are in `research.md` R1, and changes made during implementation are at the end of that file.
 
 **Storage**: Browser localStorage only, under the keys in `contracts/storage.md`
 
@@ -140,7 +140,7 @@ chunk.
 | Software rendering in automated browsers is slow | Time-step clamp keeps speeds accurate down to 4 fps (R10) |
 | `react` update breaks the renderer | Held to `~19.3.1` (R1) |
 | Bundle pulls heavy drei dependencies | Named imports only, and a bundle check in the quickstart |
-| No Iris Xe or Mac available to test on | Report the hardware actually used, and note gaps in `README.md` (R16) |
+| No Iris Xe or Mac available to test on | Measured on Intel Arc integrated graphics; gaps are in `README.md` (R16) |
 
 ## Complexity Tracking
 

@@ -28,3 +28,6 @@ Thumbs.db
 # Personal AI tool settings (shared ones stay tracked)
 .claude/settings.local.json
 CLAUDE.local.md
+
+# Temporary asset downloads
+.asset-downloads/
