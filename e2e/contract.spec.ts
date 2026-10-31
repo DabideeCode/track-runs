@@ -579,7 +579,10 @@ test.describe('settings and audio', () => {
     expect(await audio()).toMatchObject({ context: null, total: 0 })
 
     await testId(page, 'new-diorama').click()
-    await expect.poll(async () => (await audio()).context).toBe('running')
+    // Playwright's WebKit build has no Web Audio, unlike Safari; Howler then uses HTML5 audio.
+    if (await page.evaluate(() => typeof AudioContext !== 'undefined')) {
+      await expect.poll(async () => (await audio()).context).toBe('running')
+    }
     await expect.poll(async () => await audio()).toMatchObject({ total: 12, loaded: 12 })
     await expect.poll(async () => (await audio()).music).toBe(true)
   })
