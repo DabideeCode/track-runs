@@ -1,4 +1,4 @@
-import { CATALOG, isTrackType } from './catalog'
+import { isTrackType } from './catalog'
 import { connectorsOf, footprint, isOnGrid, nextRotation, opposite, sideDelta } from './grid'
 import type { Piece, PieceType, Reason, Rotation, Side } from './types'
 
@@ -43,6 +43,8 @@ export const validate = (
 }
 
 const trackAt = (occupancy: Map<number, Piece>, gridX: number, gridZ: number) => {
+  // Tile keys are only unique on the grid: off it they would alias the opposite edge.
+  if (!isOnGrid(gridX, gridZ)) return undefined
   const piece = occupancy.get(tileKey(gridX, gridZ))
   return piece && isTrackType(piece.type) ? piece : undefined
 }
@@ -114,4 +116,7 @@ export const autoRotate = (
   return candidate.rotation
 }
 
-export const pieceHeight = (type: PieceType) => CATALOG[type].pick[2]
+/** True when pieces could have been placed in this order, which a damaged save may not satisfy. */
+export const isLegalLayout = (pieces: Piece[]) =>
+  new Set(pieces.map((piece) => piece.id)).size === pieces.length &&
+  pieces.every((piece, index) => validate(pieces.slice(0, index), piece) === null)

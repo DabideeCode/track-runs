@@ -1,5 +1,6 @@
 import { isPieceType } from './catalog'
 import { isOnGrid } from './grid'
+import { isLegalLayout } from './rules'
 import type { Diorama, Piece } from './types'
 
 export const SAVE_KEY = 'wooden-diorama:v1'
@@ -73,6 +74,7 @@ export const isDiorama = (value: unknown): value is Diorama =>
   (value.startFacing === 0 || value.startFacing === 180) &&
   Array.isArray(value.pieces) &&
   value.pieces.every(isPiece) &&
+  isLegalLayout(value.pieces) &&
   isDate(value.createdAt) &&
   isDate(value.updatedAt) &&
   (value.thumbnail === undefined || typeof value.thumbnail === 'string')

@@ -95,6 +95,13 @@ describe('moving, rotating, removing', () => {
     expect(hook.movePiece(id!, 3, 4).ok).toBe(true)
     expect(hook.getSoundLog()).toEqual(['move', 'snap'])
   })
+  it('snaps when a piece reconnects to the same neighbour on another side', () => {
+    hook.placePiece('straight', 5, 5, 0)
+    const { id } = hook.placePiece('straight', 5, 4, 0)
+    clearSoundLog()
+    hook.movePiece(id!, 5, 6)
+    expect(hook.getSoundLog()).toEqual(['move', 'snap'])
+  })
   it('leaves an invalid move where it was', () => {
     hook.placePiece('house', 3, 3, 0)
     const { id } = hook.placePiece('straight', 8, 8, 0)
@@ -144,9 +151,10 @@ describe('station drags', () => {
 describe('drag', () => {
   it('places from the palette, selects it, restores the tool and adds one entry', () => {
     game().dragFromPalette('straight')
-    expect(game().selectedTool).toBeNull()
+    expect(game().selectedTool).toBe('straight')
     game().dragUpdate({ x: 0, z: 0 }, { gridX: 8, gridZ: 8 })
     game().dragEnd()
+    expect(game().selectedTool).toBeNull()
     expect(hook.getState().pieces).toHaveLength(1)
     expect(hook.getState().selectedPieceId).toBe(hook.getState().pieces[0].id)
     expect(hook.getSoundLog()).toEqual(['pickup', 'place'])
@@ -212,6 +220,13 @@ describe('clicking with a tool', () => {
   it('disables a second station through the tool too', () => {
     hook.placePiece('station', 3, 3, 0)
     game().selectTool('station')
+    expect(game().selectedTool).toBeNull()
+  })
+  it('clears the station tool once a dragged station lands', () => {
+    game().selectTool('station')
+    game().dragFromPalette('station')
+    game().dragUpdate({ x: 0, z: 0 }, { gridX: 8, gridZ: 8 })
+    game().dragEnd()
     expect(game().selectedTool).toBeNull()
   })
   it('deselects the tool when the last station spot is taken', () => {
@@ -442,6 +457,34 @@ describe('corrupt storage', () => {
     ['bad rotation', { pieces: [{ id: 'x', type: 'car', gridX: 1, gridZ: 1, rotation: 45 }] }],
     ['null piece', { pieces: [null] }],
     ['bad date', { updatedAt: 'yesterday' }],
+    [
+      'two pieces on one tile',
+      {
+        pieces: [
+          { id: 'x', type: 'car', gridX: 1, gridZ: 1, rotation: 0 },
+          { id: 'y', type: 'house', gridX: 1, gridZ: 1, rotation: 0 },
+        ],
+      },
+    ],
+    [
+      'two stations',
+      {
+        pieces: [
+          { id: 'x', type: 'station', gridX: 1, gridZ: 1, rotation: 0 },
+          { id: 'y', type: 'station', gridX: 3, gridZ: 3, rotation: 0 },
+        ],
+      },
+    ],
+    ['a hill over the edge', { pieces: [{ id: 'x', type: 'hill', gridX: 15, gridZ: 1, rotation: 0 }] }],
+    [
+      'duplicate ids',
+      {
+        pieces: [
+          { id: 'x', type: 'car', gridX: 1, gridZ: 1, rotation: 0 },
+          { id: 'x', type: 'car', gridX: 2, gridZ: 1, rotation: 0 },
+        ],
+      },
+    ],
   ])('skips an entry with %s, keeps good ones and warns', (_name, over) => {
     localStorage.setItem(
       SAVE_KEY,

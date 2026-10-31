@@ -91,12 +91,16 @@ const walk = (
   exit: Side,
 ): { steps: { piece: Piece; entry: Side }[]; closed: boolean } => {
   const steps: { piece: Piece; entry: Side }[] = []
+  const visited = new Set([start.id])
   let current = start
   let side: Side | undefined = exit
   while (side) {
     const next = connectedNeighbour(occupancy, current, side)
     if (!next) return { steps, closed: false }
     if (next.id === start.id) return { steps, closed: true }
+    // Valid layouts cannot revisit a track; this only stops a damaged one from looping forever.
+    if (visited.has(next.id)) return { steps, closed: false }
+    visited.add(next.id)
     const entry = opposite(side)
     steps.push({ piece: next, entry })
     current = next

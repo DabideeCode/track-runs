@@ -4,7 +4,6 @@ import { OrbitControls } from '@react-three/drei'
 import * as THREE from 'three'
 import { GRID_HALF } from '@/game/grid'
 import { DEFAULT_POSITION, DEFAULT_TARGET } from './cameraDefaults'
-import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib'
 
 const DEG = Math.PI / 180
 
@@ -18,7 +17,7 @@ export const resetCamera = () => resetRequest?.()
 const easeInOut = (t: number) => (t < 0.5 ? 2 * t * t : 1 - (-2 * t + 2) ** 2 / 2)
 
 export function CameraRig() {
-  const controls = useRef<OrbitControlsImpl>(null)
+  const controls = useRef<React.ComponentRef<typeof OrbitControls>>(null)
   const camera = useThree((state) => state.camera)
   const invalidate = useThree((state) => state.invalidate)
   const glide = useRef<{
@@ -73,7 +72,7 @@ export function CameraRig() {
 
   return (
     <OrbitControls
-      ref={controls as never}
+      ref={controls}
       makeDefault
       target={DEFAULT_TARGET.toArray()}
       enableDamping

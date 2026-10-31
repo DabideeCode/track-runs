@@ -288,7 +288,8 @@ export function SettingScene({ textures }: { textures: TextureSet }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  useFrame((_, dt) => {
+  useFrame((_, rawDt) => {
+    const dt = Math.min(rawDt, 0.05)
     const goal = useGame.getState().setting === 'kitchen' ? 1 : 0
     const step = goal - blend.current
     if (step === 0) return

@@ -71,6 +71,8 @@ export function Ghost() {
     tiltZ: 0,
     scale: 0,
     visibleType: null as PieceType | null,
+    /** The ghost has a position of its own: false until it first has somewhere to be. */
+    placed: false,
     effectKey: 0,
     effectTime: 0,
     valid: true,
@@ -100,6 +102,12 @@ export function Ghost() {
     let settle = view?.lifted ? LIFT : HOVER_LIFT
 
     if (dropEffect && !view) {
+      if (!motion.placed) {
+        // Dropped without ever being shown, such as back on the palette: nothing to play out.
+        ghostPose.active = false
+        finishDropEffect()
+        return
+      }
       if (dropEffect.key !== motion.effectKey) {
         motion.effectKey = dropEffect.key
         motion.effectTime = 0
@@ -121,27 +129,27 @@ export function Ghost() {
       }
     }
 
-    if (!type) {
+    // No type, or a drag whose pointer is off the canvas: hidden, and it reappears at the pointer.
+    if (!type || (view && !view.target)) {
       ghostPose.active = false
       root.visible = false
-      motion.visibleType = null
-      motion.scale = 0
+      if (blob.current) blob.current.visible = false
+      motion.visibleType = type
+      motion.placed = false
       return
     }
 
-    const appearing = motion.visibleType === null
-    if (motion.visibleType !== type || appearing) {
-      motion.visibleType = type
-      if (view?.target) {
-        motion.x = view.target.x
-        motion.z = view.target.z
-        motion.vx = motion.vz = 0
-        if (view.lifted) motion.y = 0
-      }
-      if (view) {
-        motion.rotation = view.rotation
-        motion.rotationGoal = view.rotation
-      }
+    if (motion.visibleType !== type) motion.placed = false
+    motion.visibleType = type
+    if (!motion.placed && view?.target) {
+      motion.placed = true
+      motion.x = view.target.x
+      motion.z = view.target.z
+      motion.vx = motion.vz = 0
+      motion.y = view.lifted ? 0 : HOVER_LIFT
+      motion.scale = 0
+      motion.tiltX = motion.tiltZ = 0
+      motion.rotation = motion.rotationGoal = view.rotation
     }
 
     // Damped spring toward the snapped tile.
@@ -187,9 +195,10 @@ export function Ghost() {
       }
     }
 
-    root.visible = view?.target !== null || !!dropEffect
+    root.visible = true
     root.position.set(motion.x + shake, motion.y, motion.z)
-    root.rotation.set(motion.tiltX, (-motion.rotation * Math.PI) / 180, motion.tiltZ, 'YXZ')
+    // XZY applies the yaw first, so the tilt stays in world axes whichever way the piece faces.
+    root.rotation.set(motion.tiltX, (-motion.rotation * Math.PI) / 180, motion.tiltZ, 'XZY')
     root.scale.setScalar(motion.scale * vanishing)
 
     ghostPose.active = true

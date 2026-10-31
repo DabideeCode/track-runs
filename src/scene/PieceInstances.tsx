@@ -18,6 +18,7 @@ const LAND_CONTACT = 0.06
 const ROTATE_TIME = 0.15
 const HOVER_RISE = 0.05
 const LIFT = 0.3
+const MAX_FRAME = 0.05
 
 interface Anim {
   piece: Piece
@@ -167,6 +168,7 @@ export function PieceInstances({ textures }: { textures: TextureSet }) {
   const slots = useRef(new Map<PieceType, Anim[]>())
   const blobMesh = useRef<THREE.InstancedMesh>(null)
   const busyIds = useRef(new Set<string>())
+  const lastHover = useRef<string | null>(null)
   const [fades, setFades] = useState<Fade[]>([])
   const fadeKey = useRef(0)
 
@@ -247,6 +249,10 @@ export function PieceInstances({ textures }: { textures: TextureSet }) {
   const syncPieces = (now: number) => {
     const state = useGame.getState()
     const hidden = state.drag?.pieceId ?? state.dropEffect?.pieceId ?? null
+    if (meshes.current.size < ALL_TYPES.length) {
+      invalidate()
+      return false
+    }
     const first = !lastSynced.current
     const instant = first || state.instantEdit
 
@@ -297,8 +303,10 @@ export function PieceInstances({ textures }: { textures: TextureSet }) {
           if (delta !== 0) {
             // R always turns clockwise, even the 270 to 0 step.
             const turn = delta < 0 ? delta + 360 : delta
+            // Continue from where the last turn was heading, so a quick second R adds up.
+            const base = a.rotationStart >= 0 ? a.rotationTo : a.rotation
             a.rotationFrom = a.rotation
-            a.rotationTo = a.rotation + (movedTile ? delta : turn)
+            a.rotationTo = base + (movedTile ? delta : turn)
             a.rotationStart = now
           }
           busyIds.current.add(piece.id)
@@ -324,7 +332,9 @@ export function PieceInstances({ textures }: { textures: TextureSet }) {
   }
 
   // Before the ghost and outline in the same frame.
-  useFrame((_, dt) => {
+  useFrame((_, rawDt) => {
+    // In demand mode the first delta after idling is the whole idle gap.
+    const dt = Math.min(rawDt, MAX_FRAME)
     clock.current += dt
     const now = clock.current
     const state = useGame.getState()
@@ -332,6 +342,8 @@ export function PieceInstances({ textures }: { textures: TextureSet }) {
 
     const hoverId = state.drag || state.selectedTool ? null : state.hoverPieceId
     if (hoverId) busyIds.current.add(hoverId)
+    if (lastHover.current && lastHover.current !== hoverId) busyIds.current.add(lastHover.current)
+    lastHover.current = hoverId
 
     for (const id of busyIds.current) {
       const a = anims.get(id)

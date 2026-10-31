@@ -110,6 +110,14 @@ describe('connections', () => {
     const east = p('straight', 6, 5, 90)
     expect(findConnections([c, south, east])).toHaveLength(2)
   })
+  it('never connects across opposite grid edges', () => {
+    expect(findConnections([p('straight', 5, 15), p('straight', 6, 0)])).toEqual([])
+    expect(findConnections([p('straight', 6, 0), p('straight', 5, 15)])).toEqual([])
+    expect(openEnds([p('straight', 5, 15), p('straight', 6, 0)])).toHaveLength(4)
+    expect(
+      autoRotate([p('straight', 6, 0)], { type: 'curve', gridX: 5, gridZ: 15, rotation: 90 }),
+    ).toBe(90)
+  })
   it('lists open ends with the side they face', () => {
     const a = p('straight', 5, 5)
     const b = p('straight', 5, 6)

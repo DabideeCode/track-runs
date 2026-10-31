@@ -64,8 +64,8 @@ Add `?test=1` to the URL to expose `window.__DIORAMA__` in a production build. I
 
 ## Known limitations
 
-- **Short track.** The train is about 2.7 tiles long. If there is less track than that behind the station, the carriages sit past the open end on the ground instead of on rails, and the train will not reverse beyond its starting point.
-- **Parked train overlap.** Those carriages are not checked against the placement rules, so a parked train can visually overlap a decoration standing just beyond a track end, or reach past the grid edge.
+- **Short track.** The train is about 2.7 tiles long and the locomotive always starts on the station. With less than about 2.25 tiles of track behind the station, the parked carriages therefore rest past the open end, off the rails, until the train has run forward. It then stays fully on the rails, reversing until its tail reaches the track end. With fewer than about 2.7 tiles of track in total the whole train cannot fit, so the carriages stay past the end.
+- **Parked train overlap.** Those parked carriages are not checked against the placement rules, so they can visually overlap a decoration just beyond a track end, or reach past the grid edge.
 - **Browser coverage.** The automated suite passes in Chrome, Firefox and Playwright's WebKit on Windows. Set `PW_BROWSER=firefox` or `PW_BROWSER=webkit` to run it there. Edge shares Chrome's engine and was not run separately. Safari itself was not available: WebKit is the closest stand-in, and that build has no Web Audio, so Safari's audio path is the least tested.
 - **Sounds were chosen by measurement.** They were selected and shaped using duration, level and frequency measurements, not by ear, so their balance may benefit from a listening pass.
 - **Save size.** Browser storage is limited to a few megabytes. If it fills, a message says so, and a save without a thumbnail is tried first.

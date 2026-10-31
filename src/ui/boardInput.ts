@@ -84,6 +84,11 @@ const onPointerDown = (event: PointerEvent) => {
 
 const onPointerMove = (event: PointerEvent) => {
   const game = useGame.getState()
+  // With another button held, releasing the left one arrives as a move, not a pointer up.
+  if ((press || game.drag) && (event.buttons & 1) === 0) {
+    releaseLeft(event)
+    return
+  }
   if (press && !game.drag) {
     const moved = Math.hypot(event.clientX - press.x, event.clientY - press.y)
     if (moved >= DRAG_THRESHOLD) {
@@ -112,7 +117,10 @@ const onPointerMove = (event: PointerEvent) => {
 }
 
 const onPointerUp = (event: PointerEvent) => {
-  if (event.button !== 0) return
+  if (event.button === 0) releaseLeft(event)
+}
+
+const releaseLeft = (event: PointerEvent) => {
   const game = useGame.getState()
   if (game.drag) {
     updateDrag(event)
@@ -130,6 +138,10 @@ const onPointerUp = (event: PointerEvent) => {
   }
   press = null
   updateCursor()
+  // The click that follows a release lands first. After that, keyboard clicks must get through.
+  window.setTimeout(() => {
+    suppressClick = false
+  })
 }
 
 const cancel = () => {

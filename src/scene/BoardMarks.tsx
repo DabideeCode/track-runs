@@ -38,7 +38,8 @@ export function GridLines() {
   )
   const mesh = useRef<THREE.Mesh>(null)
 
-  useFrame((_, dt) => {
+  useFrame((_, rawDt) => {
+    const dt = Math.min(rawDt, 0.05)
     const goal = useGame.getState().mode === 'build' ? GRID_OPACITY : 0
     const step = goal - material.opacity
     if (step === 0) return

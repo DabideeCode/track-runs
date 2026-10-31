@@ -149,8 +149,12 @@ export const uniqueName = (taken: string[]) => {
   }
 }
 
-const connectionKeys = (pieces: Piece[]) =>
-  new Set(findConnections(pieces).map(([a, b]) => (a < b ? `${a}|${b}` : `${b}|${a}`)))
+/** Includes tiles, so meeting the same neighbour on a different side counts as a new connection. */
+const connectionKeys = (pieces: Piece[]) => {
+  const byId = new Map(pieces.map((piece) => [piece.id, piece]))
+  const end = (id: string) => `${id}@${byId.get(id)!.gridX},${byId.get(id)!.gridZ}`
+  return new Set(findConnections(pieces).map(([a, b]) => [end(a), end(b)].sort().join('|')))
+}
 
 const madeConnection = (before: Piece[], after: Piece[]) => {
   const old = connectionKeys(before)
@@ -303,7 +307,11 @@ export const useGame = create<Store>()((set, get) => {
         gridZ,
         rotation: adjust ? autoRotate(state.pieces, { type, gridX, gridZ, rotation: base }) : base,
       }
-      commit([...state.pieces, piece], options.select ? { selectedPieceId: piece.id } : {})
+      commit([...state.pieces, piece], {
+        ...(options.select ? { selectedPieceId: piece.id } : {}),
+        // There can only be one, so the tool has nothing left to place.
+        ...(type === 'station' && get().selectedTool === 'station' ? { selectedTool: null } : {}),
+      })
       playSound('place')
       snapIfConnected(state.pieces)
       return { ok: true, id: piece.id }
@@ -382,8 +390,7 @@ export const useGame = create<Store>()((set, get) => {
     clickTile(gridX, gridZ) {
       const { selectedTool, toolRotation } = get()
       if (!selectedTool) return
-      const result = get().place(selectedTool, gridX, gridZ, toolRotation, { adjust: true })
-      if (result.ok && selectedTool === 'station') set({ selectedTool: null })
+      get().place(selectedTool, gridX, gridZ, toolRotation, { adjust: true })
     },
 
     setHover(tile, pieceId) {
@@ -438,7 +445,7 @@ export const useGame = create<Store>()((set, get) => {
           grabDZ: 0,
           previousTool: state.selectedTool,
         },
-        selectedTool: null,
+        selectedTool: type,
         selectedPieceId: null,
         dropEffect: null,
       })

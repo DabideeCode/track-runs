@@ -173,6 +173,40 @@ test.describe('placing with the pointer', () => {
     expect((await gameState(page)).pieces[0]).toMatchObject({ gridX: 7, gridZ: 7, rotation: 90 })
   })
 
+  test('releasing the left button with the right one held still drops the piece', async ({
+    page,
+  }) => {
+    await newDiorama(page)
+    await dragPaletteToTile(page, 'car', 8, 8)
+    await page.mouse.down({ button: 'right' })
+    await page.mouse.up({ button: 'left' })
+    await page.mouse.up({ button: 'right' })
+    expect((await gameState(page)).pieces).toHaveLength(1)
+    const far = tileToScreen(page, 3, 3)
+    await page.mouse.move(far.x, far.y)
+    await page.mouse.click(far.x, far.y)
+    expect((await gameState(page)).pieces).toHaveLength(1)
+    expect((await gameState(page)).pieces[0]).toMatchObject({ gridX: 8, gridZ: 8 })
+  })
+
+  test('the palette answers the keyboard straight after a drag', async ({ page }) => {
+    await newDiorama(page)
+    await dragPaletteToTile(page, 'car', 8, 8)
+    await page.mouse.up()
+    await testId(page, 'palette-house').focus()
+    await page.keyboard.press('Enter')
+    expect((await gameState(page)).selectedTool).toBe('house')
+  })
+
+  test('a palette drag stores the dragged item as the selected tool', async ({ page }) => {
+    await newDiorama(page)
+    await dragPaletteToTile(page, 'pineTree', 8, 8)
+    expect((await gameState(page)).selectedTool).toBe('pineTree')
+    await expect(testId(page, 'palette-pineTree')).toHaveAttribute('aria-pressed', 'true')
+    await page.mouse.up()
+    expect((await gameState(page)).selectedTool).toBeNull()
+  })
+
   test('auto-adjust turns a dropped track to connect', async ({ page }) => {
     await newDiorama(page)
     await page.evaluate(() => window.__DIORAMA__!.placePiece('straight', 8, 8, 90))

@@ -53,7 +53,8 @@ export function Train({ textures }: { textures: TextureSet }) {
     [],
   )
 
-  useFrame((state, dt) => {
+  useFrame((state, rawDt) => {
+    const dt = Math.min(rawDt, 0.05)
     const { pieces, startFacing, mode, drag } = useGame.getState()
     const playing = mode === 'play'
 

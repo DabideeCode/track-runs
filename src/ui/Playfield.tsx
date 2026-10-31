@@ -1,4 +1,4 @@
-import { lazy, Suspense, useEffect, useState } from 'react'
+import { lazy, Suspense, useEffect, useRef, useState } from 'react'
 import {
   ArrowLeft,
   ArrowLeftRight,
@@ -278,6 +278,8 @@ export function Playfield() {
   const mode = useGame((state) => state.mode)
   const goToMenu = useGame((state) => state.goToMenu)
   const [leaving, setLeaving] = useState(false)
+  const leavingRef = useRef(false)
+  leavingRef.current = leaving
 
   useBoardInput()
   useKeyboard()
@@ -285,6 +287,8 @@ export function Playfield() {
   useEffect(() => {
     const id = window.setInterval(() => {
       const state = useGame.getState()
+      // While the save, discard or cancel dialog is open, that choice is the user's to make.
+      if (leavingRef.current) return
       if (state.mode === 'build' && state.isDirty && !state.drag) state.save({ auto: true })
     }, AUTOSAVE_INTERVAL)
     return () => window.clearInterval(id)

@@ -58,7 +58,7 @@ export const CATALOG: Record<PieceType, CatalogItem> = {
   pineTree: decoration('pineTree', 'Pine tree', 0.36, 0.36, 1.2, 0.46),
   roundTree: decoration('roundTree', 'Round tree', 0.32, 0.32, 1, 0.4),
   hill: decoration('hill', 'Hill', 0.96, 0.96, 0.6, 1.15, 2),
-  car: decoration('car', 'Toy car', 0.26, 0.17, 0.2, 0.3),
+  car: decoration('car', 'Toy car', 0.17, 0.27, 0.24, 0.3),
   cassette: decoration('cassette', 'Cassette tape', 0.34, 0.22, 0.08, 0.42),
   blocks: decoration('blocks', 'Building blocks', 0.34, 0.34, 0.66, 0.46),
 }

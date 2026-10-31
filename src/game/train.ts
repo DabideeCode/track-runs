@@ -46,7 +46,8 @@ export const createTrain = (chain: Chain): TrainState => {
     dir: 1,
     pause: 0,
     arrived: false,
-    // Starting from a short stub, reverse only as far as the start point.
+    // With a short stub behind the station the tail starts past the end of the track, so
+    // the start point is the limit until the whole train is on the rails.
     minS: Math.min(TRAIN_TAIL, s),
     maxS: Math.max(chain.length - LOCO_HALF, s),
   }
@@ -72,6 +73,7 @@ const arriveIfAtEnd = (train: TrainState, room: number, events: TrainEvent[]) =>
 
 const advance = (train: TrainState, dt: number) => {
   train.s += train.dir * train.speed * dt
+  if (train.s >= TRAIN_TAIL) train.minS = TRAIN_TAIL
 }
 
 const stepAuto = (train: TrainState, dt: number, events: TrainEvent[]) => {

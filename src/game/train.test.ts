@@ -89,6 +89,13 @@ describe('piecePath', () => {
 })
 
 describe('buildChain', () => {
+  it('ends on overlapping tracks instead of walking forever', () => {
+    // Only reachable from a damaged save: the station shares a tile with a curve in a ring.
+    const ring = [p('curve', 2, 2, 0), p('curve', 3, 2, 90), p('curve', 3, 3, 180), p('curve', 2, 3, 270)]
+    const station = p('station', 2, 2, 0)
+    expect(buildChain([station, ...ring], station.id, 0)).not.toBeNull()
+    expect(buildChain([...ring, station], station.id, 0)).not.toBeNull()
+  })
   it('walks a closed loop', () => {
     const chain = chainOf(loop())
     expect(chain.closed).toBe(true)
@@ -298,12 +305,42 @@ describe('short track', () => {
       expect(Number.isFinite(pose.z)).toBe(true)
     }
   })
-  it('can always return to the station when the track behind is short', () => {
+  it('stays on the rails once it has left a short stub behind', () => {
+    // One tile behind the station, plenty ahead.
     const pieces = line(0, 6, 5)
     const train = createTrain(chainOf(pieces))
     const start = train.s
-    run(train, 30, auto)
-    expect(train.s).toBeGreaterThanOrEqual(start - 1e-6)
+    run(train, 8, auto)
+    expect(train.s).toBeGreaterThan(start)
+    let lowest = Infinity
+    for (let i = 0; i < 1800; i++) {
+      stepTrain(train, 1 / 60, auto)
+      lowest = Math.min(lowest, train.s)
+    }
+    // The tail reaches the track end and no further: the whole train stays on the track.
+    expect(lowest).toBeCloseTo(2.25)
+  })
+  it('turns back at the tail end of the track, not at the station', () => {
+    const pieces = line(0, 6, 5)
+    const train = createTrain(chainOf(pieces))
+    const stationS = train.s
+    const bumps: number[] = []
+    for (let i = 0; i < 1800; i++) {
+      if (stepTrain(train, 1 / 60, auto).includes('bump')) bumps.push(train.s)
+    }
+    expect(bumps.length).toBeGreaterThan(2)
+    expect(Math.min(...bumps)).toBeGreaterThan(stationS)
+  })
+  it('never jumps when reversing from a parked overhang', () => {
+    const train = createTrain(chainOf(line(0, 6, 5)))
+    const start = train.s
+    run(train, 1, manual(false, true))
+    expect(train.s).toBeCloseTo(start)
+    run(train, 0.5, manual(true, false))
+    const moved = train.s
+    expect(moved).toBeGreaterThan(start)
+    run(train, 2, manual(false, true))
+    expect(train.s).toBeCloseTo(start)
   })
 })
 

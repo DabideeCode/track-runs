@@ -39,8 +39,8 @@ sounds" hold by construction.
 ### Placement and input
 - A click with a palette tool places the piece and keeps the tool, for repeated placing. Clicking an
   occupied tile with a tool active is an invalid placement, it does not select.
-- Dragging from the palette does not change `selectedTool` permanently; after the drop the previous
-  tool is restored and the new piece is selected.
+- During a palette drag `selectedTool` holds the dragged item (AC-4.2). After the drop the previous
+  tool is restored, and the new piece is selected if no tool was active.
 - R also rotates the hover ghost while a tool is active (the requirement only names the drag ghost).
 - Pressing a placed piece and moving less than 5 px is a click. Grabbing a tile of a hill keeps that
   grab offset while dragging.
@@ -62,9 +62,11 @@ sounds" hold by construction.
 - `getTrain()` returns the parked train in Build mode, and `null` without a station.
 - A train stops with its leading end at the end of the chain: the locomotive nose going forward, the
   last carriage's tail in reverse. The buffer stop's usable length ends at the block face.
-- When the track behind the station is shorter than the train, the carriages run on along the end
-  tangent, past the open end. Reverse travel is then limited to the starting point, so the train can
-  always return to the station. This is listed as a known limitation in `README.md`.
+- AC-9.1 and AC-10.3 cannot both hold when the track behind the station is shorter than the train.
+  The test contract's `pieceId` makes AC-9.1 the firm one, so the carriages then rest past the open
+  end, along its tangent. Reverse is limited to the start point only until the train is fully on the
+  rails; after that it reverses until its tail reaches the track end, so a running train stays on the
+  track. A chain too short for the train never gets there. This is a known limitation in `README.md`.
 - Entering Play resets `driveMode` to `auto` (AC-10.2 says Play starts in Auto).
 - Switching Auto to Manual while moving brakes to a stop. Pressing W and S together counts as neither.
 - The whistle plays when entering Play mode only, not on each reversal. `chug` is logged each time
@@ -75,6 +77,7 @@ sounds" hold by construction.
   and leaving an untouched new diorama therefore saves nothing and asks nothing.
 - `isDirty` tracks pieces, setting, start facing and name. Mode changes are not edits.
 - Autosave also shows a toast, because AC-11.4 says each save.
+- A save whose layout breaks FR-8 (overlaps, two stations, a hill over the edge) counts as corrupt.
 - Saving keeps corrupt entries in storage rather than deleting them. A wholly unreadable file is moved
   to `wooden-diorama:v1:corrupt`, then the app starts clean.
 - Thumbnails (AC-1.7) are small JPEG data URLs captured at save.
