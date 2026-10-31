@@ -81,11 +81,13 @@ export function Train({ textures }: { textures: TextureSet }) {
     } else {
       shown.current = wanted
     }
-    if (root.current) {
-      root.current.visible = shown.current > 0.01
-      root.current.scale.setScalar(1)
+    if (root.current) root.current.visible = shown.current > 0.01
+    for (const group of groups.current) group?.scale.setScalar(shown.current)
+    if (!poses) {
+      // Gone with its station: a new station starts the train fresh rather than sliding it over.
+      if (shown.current === 0) views.current = null
+      return
     }
-    if (!poses) return
 
     if (!views.current) views.current = poses.map(({ x, z, yaw }) => ({ x, z, yaw }))
 
@@ -117,7 +119,6 @@ export function Train({ textures }: { textures: TextureSet }) {
         const bob = speed > 0 ? Math.sin(state.clock.elapsedTime * 16 + index) * 0.0035 : 0
         group.position.set(view.x, bob, view.z)
         group.rotation.y = view.yaw
-        group.scale.setScalar(shown.current)
       }
     })
     if (settling) invalidate()

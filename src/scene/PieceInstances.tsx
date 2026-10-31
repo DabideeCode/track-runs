@@ -14,7 +14,7 @@ const CAPACITY = 256
 const ALL_TYPES: PieceType[] = [...TRACK_TYPES, ...DECORATION_TYPES]
 
 const LAND_TIME = 0.26
-const LAND_CONTACT = 0.09
+const LAND_CONTACT = 0.06
 const ROTATE_TIME = 0.15
 const HOVER_RISE = 0.05
 const LIFT = 0.3

@@ -557,6 +557,47 @@ test.describe('settings and audio', () => {
     await expect(testId(page, 'mute-toggle')).toHaveAttribute('aria-pressed', 'true')
   })
 
+  test('audio waits for the first gesture, then music and effects load', async ({ page }) => {
+    await openApp(page)
+    const audio = () =>
+      page.evaluate(() => {
+        const { Howler } = window as never as {
+          Howler: {
+            ctx?: AudioContext
+            _howls: { state(): string; playing(): boolean; _src: string | string[] }[]
+          }
+        }
+        return {
+          context: Howler.ctx?.state ?? null,
+          loaded: Howler._howls.filter((howl) => howl.state() === 'loaded').length,
+          total: Howler._howls.length,
+          music: Howler._howls.some(
+            (howl) => String(howl._src).includes('life-of-riley') && howl.playing(),
+          ),
+        }
+      })
+    expect(await audio()).toMatchObject({ context: null, total: 0 })
+
+    await testId(page, 'new-diorama').click()
+    await expect.poll(async () => (await audio()).context).toBe('running')
+    await expect.poll(async () => await audio()).toMatchObject({ total: 12, loaded: 12 })
+    await expect.poll(async () => (await audio()).music).toBe(true)
+  })
+
+  test('autosaves unsaved changes every 30 seconds in build mode', async ({ page }) => {
+    await page.clock.install()
+    await newDiorama(page)
+    await page.evaluate(() => window.__DIORAMA__!.placePiece('car', 8, 8, 0))
+    expect((await gameState(page)).isDirty).toBe(true)
+    await page.clock.fastForward(31_000)
+    await expect.poll(async () => (await gameState(page)).isDirty).toBe(false)
+    await expect(testId(page, 'toast')).toContainText(/autosaved/i)
+    const saved = await page.evaluate(() =>
+      JSON.parse(localStorage.getItem('wooden-diorama:v1') ?? 'null'),
+    )
+    expect(saved.dioramas).toHaveLength(1)
+  })
+
   test('overlay buttons play the UI click', async ({ page }) => {
     await newDiorama(page)
     await testId(page, 'reset-view').click()

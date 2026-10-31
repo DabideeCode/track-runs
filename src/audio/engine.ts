@@ -72,8 +72,8 @@ const play = (name: SoundName) => {
   if (name === 'chug') return
   const howl = sfx[name]
   if (!howl) return
-  howl.play()
   howl.volume(settings().sfxVolume)
+  howl.play()
 }
 
 /** Waits for the first user gesture, then starts audio. Safe to call once at startup. */

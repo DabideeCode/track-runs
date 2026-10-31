@@ -5,48 +5,55 @@ import { GRID_HALF, GRID_SIZE, sideDelta, tileCenter } from '@/game/grid'
 import { openEnds } from '@/game/rules'
 import { useGame } from '@/game/store'
 
-/** Subtle lines, faded out in Play mode. */
+const LINE_WIDTH = 0.034
+const GRID_OPACITY = 0.36
+
+/** Subtle lines, faded out in Play mode. Thin strips rather than GL lines, so they keep their
+ *  weight at every zoom and pixel ratio. */
 export function GridLines() {
   const invalidate = useThree((state) => state.invalidate)
   const geometry = useMemo(() => {
-    const points: number[] = []
+    const half = LINE_WIDTH / 2
+    const positions: number[] = []
+    const strip = (x0: number, z0: number, x1: number, z1: number) =>
+      positions.push(x0, 0, z1, x1, 0, z1, x1, 0, z0, x0, 0, z1, x1, 0, z0, x0, 0, z0)
     for (let i = 0; i <= GRID_SIZE; i++) {
       const at = i - GRID_HALF
-      points.push(at, 0, -GRID_HALF, at, 0, GRID_HALF)
-      points.push(-GRID_HALF, 0, at, GRID_HALF, 0, at)
+      strip(at - half, -GRID_HALF - half, at + half, GRID_HALF + half)
+      strip(-GRID_HALF - half, at - half, GRID_HALF + half, at + half)
     }
     const buffer = new THREE.BufferGeometry()
-    buffer.setAttribute('position', new THREE.Float32BufferAttribute(points, 3))
+    buffer.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3))
     return buffer
   }, [])
   const material = useMemo(
     () =>
-      new THREE.LineBasicMaterial({
+      new THREE.MeshBasicMaterial({
         color: '#4f3c2a',
         transparent: true,
-        opacity: 0.42,
+        opacity: GRID_OPACITY,
         depthWrite: false,
       }),
     [],
   )
-  const lines = useRef<THREE.LineSegments>(null)
+  const mesh = useRef<THREE.Mesh>(null)
 
   useFrame((_, dt) => {
-    const goal = useGame.getState().mode === 'build' ? 0.42 : 0
+    const goal = useGame.getState().mode === 'build' ? GRID_OPACITY : 0
     const step = goal - material.opacity
     if (step === 0) return
     material.opacity = Math.abs(step) < 0.004 ? goal : material.opacity + step * (1 - Math.exp(-9 * dt))
-    if (lines.current) lines.current.visible = material.opacity > 0
+    if (mesh.current) mesh.current.visible = material.opacity > 0
     invalidate()
   })
 
-  return <lineSegments ref={lines} args={[geometry, material]} position={[0, 0.012, 0]} />
+  return <mesh ref={mesh} geometry={geometry} material={material} position={[0, 0.012, 0]} renderOrder={1} />
 }
 
 export function TileHighlight() {
   const tile = useGame((state) => (state.mode === 'build' ? state.hoverTile : null))
-  const valid = useGame((state) => !state.selectedTool && !state.drag)
-  if (!tile || !valid) return null
+  const dragging = useGame((state) => state.drag !== null)
+  if (!tile || dragging) return null
   const { x, z } = tileCenter(tile.gridX, tile.gridZ)
   return (
     <mesh position={[x, 0.014, z]} rotation={[-Math.PI / 2, 0, 0]} renderOrder={1}>

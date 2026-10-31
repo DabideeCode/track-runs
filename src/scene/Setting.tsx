@@ -35,10 +35,10 @@ const MOODS: Record<Setting, Mood> = {
   },
   // Warm evening kitchen light.
   kitchen: {
-    background: '#e0c6a2',
-    sun: '#ffd6a0',
-    sunIntensity: 2.45,
-    ambient: '#ffe2bd',
+    background: '#e6d3b8',
+    sun: '#ffe2c0',
+    sunIntensity: 2.3,
+    ambient: '#ffeace',
     ambientIntensity: 0.6,
     sky: '#ffe9cc',
     bounce: '#b98a5c',
@@ -193,6 +193,7 @@ export function SettingScene({ textures }: { textures: TextureSet }) {
   const ambient = useRef<THREE.AmbientLight>(null)
   const hemi = useRef<THREE.HemisphereLight>(null)
   const kitchenGround = useRef<THREE.Mesh>(null)
+  const rugMesh = useRef<THREE.Mesh>(null)
   const bedroomGroup = useRef<THREE.Group>(null)
   const kitchenGroup = useRef<THREE.Group>(null)
   const blend = useRef(initial === 'kitchen' ? 1 : 0)
@@ -210,16 +211,16 @@ export function SettingScene({ textures }: { textures: TextureSet }) {
       table: new THREE.MeshStandardMaterial({
         map: tabletop,
         roughness: 0.7,
-        color: '#fbf0dd',
+        color: '#fff6e8',
         transparent: true,
+        depthWrite: false,
       }),
       rug: new THREE.MeshStandardMaterial({
         map: rug,
         color: '#fff1dc',
         roughness: 0.96,
         transparent: true,
-        polygonOffset: true,
-        polygonOffsetFactor: -2,
+        depthWrite: false,
       }),
       wall: new THREE.MeshStandardMaterial({ color: '#cfd8d3', roughness: 0.9 }),
       skirting: new THREE.MeshStandardMaterial({ color: '#efe6d6', roughness: 0.75 }),
@@ -269,6 +270,7 @@ export function SettingScene({ textures }: { textures: TextureSet }) {
     ground.table.opacity = value
     ground.rug.opacity = 1 - value
     if (kitchenGround.current) kitchenGround.current.visible = value > 0.001
+    if (rugMesh.current) rugMesh.current.visible = value < 0.999
     const pop = (group: THREE.Group | null, amount: number) => {
       if (!group) return
       group.visible = amount > 0.01
@@ -335,9 +337,11 @@ export function SettingScene({ textures }: { textures: TextureSet }) {
       </mesh>
       <mesh
         rotation={[-Math.PI / 2, 0, 0]}
+        ref={rugMesh}
         position={[0, 0.002, 0]}
         material={ground.rug}
         receiveShadow
+        renderOrder={-3}
       >
         <planeGeometry args={[16.9, 16.9]} />
       </mesh>
@@ -347,7 +351,7 @@ export function SettingScene({ textures }: { textures: TextureSet }) {
         position={[0, 0.004, 0]}
         material={ground.table}
         receiveShadow
-        renderOrder={0}
+        renderOrder={-2}
         visible={initial === 'kitchen'}
       >
         <planeGeometry args={[44, 44]} />
